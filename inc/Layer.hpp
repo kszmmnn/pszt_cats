@@ -25,7 +25,7 @@ public:
 
     void CalculateOutputLayerGradient(const std::vector<double> &targets);
     void CalculateHiddenLayerGradient(const Layer &nextLayer);
-    void UpdateWeights(Layer& prevLayer);
+    void UpdateWeights(Layer &prevLayer);
 
 private:
     std::vector<Neuron> neurons;

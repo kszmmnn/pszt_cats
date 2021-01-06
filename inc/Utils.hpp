@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <random>
 
-constexpr unsigned MAX_VAL { 100 };
+constexpr unsigned MAX_VAL { 1 };
 
 class RandomNumber
 {

@@ -22,7 +22,7 @@ Layers::Layers(std::vector<unsigned> &dimensions)
 
                 for (unsigned j = 0; j < dimensions[i - 1]; ++j)
                 {
-                    weights[k].push_back(1.0); //tu zmienic na 0
+                    weights[k].push_back(0);
                 }
             }
             layers.push_back(Layer(dimensions[i], dimensions[i - 1], weights));

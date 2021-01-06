@@ -118,21 +118,50 @@ void Layer::DeriveLayer()
     }
 }
 
+//for(unsigned layerNum = m_layers.size() - 1; layerNum > 0; --layerNum)
+//{
+//    Layer &layer = m_layers[layerNum];
+//    Layer &prevLayer = m_layers[layerNum - 1];
+//
+//    for(unsigned n = 0; n < layer.size() - 1; ++n)
+//    {
+//        layer[n].updateInputWeights(prevLayer);
+//    }
+//}
+//void Neuron::updateInputWeights(Layer &prevLayer)
+//{
+//    // The weights to be updated are in the Connection container
+//    // in the nuerons in the preceding layer
+//
+//    for(unsigned n = 0; n < prevLayer.size(); ++n)
+//    {
+//        Neuron &neuron = prevLayer[n];
+//        double oldDeltaWeight = neuron.m_outputWeights[m_myIndex].deltaWeight;
+//
+//        double newDeltaWeight =
+//                // Individual input, magnified by the gradient and train rate:
+//                eta
+//                * neuron.getOutputVal()
+//                * m_gradient
+//                // Also add momentum = a fraction of the previous delta weight
+//                + alpha
+//                * oldDeltaWeight;
+//        neuron.m_outputWeights[m_myIndex].deltaWeight = newDeltaWeight;
+//        neuron.m_outputWeights[m_myIndex].weight += newDeltaWeight;
+//    }
+//}
+
 void Layer::UpdateWeights(Layer &prevLayer)
 {
-    for (unsigned i = 0; i < prevLayer.neurons.size(); ++i)
+    for (unsigned i = 0; i < neurons.size(); ++i)
     {
-        Neuron &neuron = prevLayer.neurons[i];
-
-        for (unsigned j = 0; j < neuron.GetWeights().size(); ++j)
+        for (unsigned j = 0; j < neurons[i].GetWeights().size(); ++j)
         {
-            double dWeight = /*learningrate*/1.0 * neuron.GetError()
-                                             * neuron.GetValue();
+            Neuron &neuron = prevLayer.neurons[j];
+            double dWeight = /*learningrate*/0.1 * neurons[i].GetError()
+                                             * neuron.GetActivatedValue();
 
-            neuron.SetWeight(j, dWeight + neuron.GetWeights()[j]);
-
-//            neuron.GetWeights()[j] += /*learningrate*/1.0 * neuron.GetError()
-//                                                      * neuron.GetValue();
+            neurons[i].SetWeight(j, dWeight + neurons[i].GetWeights()[j]);
         }
     }
 }
