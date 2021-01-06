@@ -34,12 +34,12 @@ Layer::~Layer()
 {
 }
 
-void Layer::SetGradients(std::vector<double>&gradients)
+void Layer::SetGradients(std::vector<double> &gradients)
 {
     assert(gradients.size() == neurons.size() && "set gradients");
     for (unsigned i = 0; i < neurons.size(); ++i)
     {
-        neurons[i].SetGradient(gradients[i]);
+        neurons[i].SetError(gradients[i]);
     }
 }
 
@@ -63,7 +63,7 @@ std::vector<double> Layer::GetDerivedValues() const
     return ret;
 }
 
-std::vector<Neuron> Layer::GetNeurons() const
+std::vector<Neuron>& Layer::GetNeurons()
 {
     return neurons;
 }
@@ -84,10 +84,55 @@ void Layer::ActivateLayer(std::vector<double> &inputs)
     }
 }
 
+void Layer::CalculateOutputLayerGradient(const std::vector<double> &targets)
+{
+    for (unsigned i = 0; i < targets.size(); ++i)
+    {
+        double dCost = 2 * (targets[i] - neurons[i].GetActivatedValue());
+        double dSigmoid = neurons[i].GetDerivedValue();
+        neurons[i].SetError(dSigmoid * dCost);
+    }
+}
+
+void Layer::CalculateHiddenLayerGradient(const Layer &nextLayer)
+{
+
+    for (unsigned i = 0; i < neurons.size(); ++i)
+    {
+        double dSigmoid = neurons[i].GetDerivedValue();
+        double errorSum { 0.0 };
+        for (unsigned j = 0; j < nextLayer.neurons.size(); ++j)
+        {
+            auto &neuron = nextLayer.neurons[j];
+            errorSum += neuron.GetError() * neuron.GetWeights()[j];
+        }
+        neurons[i].SetError(dSigmoid * errorSum);
+    }
+}
+
 void Layer::DeriveLayer()
 {
-    for(auto& neuron : neurons)
+    for (auto &neuron : neurons)
     {
-        neuron.Derive(neuron.GetValue());
+        neuron.Derive();
+    }
+}
+
+void Layer::UpdateWeights(Layer &prevLayer)
+{
+    for (unsigned i = 0; i < prevLayer.neurons.size(); ++i)
+    {
+        Neuron &neuron = prevLayer.neurons[i];
+
+        for (unsigned j = 0; j < neuron.GetWeights().size(); ++j)
+        {
+            double dWeight = /*learningrate*/1.0 * neuron.GetError()
+                                             * neuron.GetValue();
+
+            neuron.SetWeight(j, dWeight + neuron.GetWeights()[j]);
+
+//            neuron.GetWeights()[j] += /*learningrate*/1.0 * neuron.GetError()
+//                                                      * neuron.GetValue();
+        }
     }
 }

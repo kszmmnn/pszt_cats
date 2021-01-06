@@ -8,20 +8,18 @@
 class Layers
 {
 public:
-    Layers(std::vector<unsigned>& dimensions);
+    Layers(std::vector<unsigned> &dimensions);
     virtual ~Layers();
 
     void ActivateAndDeriveAll(double bwt, double hwt);
-    void Propagate(double target);
-    void CalculateHiddenLayerGradient();
-    void CalculateOutputLayerGradient();
-
+    void Propagate(std::vector<double> &target);
+    double Cost(std::vector<double> &target);
 
 private:
     std::vector<Layer> layers;
 
-    double previousError {0.0};
-    double previousSmoothingFactor {100.0};
 };
 
+//https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
+//https://www.youtube.com/watch?v=tIeHLnjs5U8
 #endif /* LAYERS_HPP_ */

@@ -16,9 +16,8 @@ void Neuron::Activate(double value)
     activatedValue = 1 / (1 + std::exp(-value));
 }
 
-void Neuron::Derive(double value)
+void Neuron::Derive()
 {
-    this->value = value;
     derivedValue = std::exp(-value) / std::pow(1 + std::exp(-value), 2);
 }
 
@@ -52,12 +51,17 @@ std::vector<double> Neuron::GetWeights() const
     return weights;
 }
 
-void Neuron::SetGradient(double _gradient)
+void Neuron::SetError(double _error)
 {
-    gradient = gradient;
+    error = _error;
 }
 
-double Neuron::GetGradient() const
+double Neuron::GetError() const
 {
-    return gradient;
+    return error;
+}
+
+void Neuron::SetWeight(unsigned pos, double _weight)
+{
+    weights[pos] = _weight;
 }

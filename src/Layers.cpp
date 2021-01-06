@@ -22,7 +22,7 @@ Layers::Layers(std::vector<unsigned> &dimensions)
 
                 for (unsigned j = 0; j < dimensions[i - 1]; ++j)
                 {
-                    weights[k].push_back(0.0);
+                    weights[k].push_back(1.0); //tu zmienic na 0
                 }
             }
             layers.push_back(Layer(dimensions[i], dimensions[i - 1], weights));
@@ -60,32 +60,46 @@ void Layers::ActivateAndDeriveAll(double bwt, double hwt)
         layer.ActivateLayer(input);
         input = layer.GetActivatedValues();
     }
-    for(auto &layer : layers)
+    for (auto &layer : layers)
     {
         layer.DeriveLayer();
     }
 }
 
-void Layers::CalculateHiddenLayerGradient()
+double Layers::Cost(std::vector<double> &target)
 {
+    double cost { 0.0 };
+    auto &outputNeurons = layers.back().GetNeurons();
+    assert(target.size() == outputNeurons.size());
 
+    for (unsigned i = 0; i < target.size(); ++i)
+    {
+        cost += std::pow((outputNeurons[i].GetActivatedValue() - target[i]), 2);
+    }
+    return cost;
 }
 
-void Layers::CalculateOutputLayerGradient()
+void Layers::Propagate(std::vector<double> &target)
 {
+    double cost = Cost(target); //moze trzeba bedzie go zmienic na jamkas srednia
+    auto &l = layers[layers.size() - 2];
+    layers.back().CalculateOutputLayerGradient(target);
+    l.CalculateHiddenLayerGradient(layers.back());
+//
+//        m_recentAverageError =
+//                (m_recentAverageError * m_recentAverageSmoothingFactor + m_error)
+//                / (m_recentAverageSmoothingFactor + 1.0);
+//        // Calculate output layer gradients
+//
+    for (unsigned i = layers.size() - 2; i > 0; --i)
+    {
+        Layer &nextLayer = layers[i + 1];
+        Layer &layer = layers[i];
+        layer.CalculateHiddenLayerGradient(nextLayer);
+    }
 
-}
-
-void Layers::Propagate(double target)
-{
-
-    double delta = target - layers.back().GetActivatedValues().back();
-    std::vector<double> outputGradientVec { delta * layers.back().GetDerivedValues().back()};
-    printf("%d  %d", layers.back().GetNeurons().size(), layers.front().GetNeurons().size());
-    puts("efs");
-    layers.back().SetGradients(outputGradientVec);
-    delta = std::abs(delta);
-
-    previousError = (previousError * previousSmoothingFactor + delta)
-            / (previousSmoothingFactor + 1.0);
+    for (unsigned i = 1; i < layers.size(); ++i)
+    {
+        layers[i].UpdateWeights(layers[i - 1]);
+    }
 }

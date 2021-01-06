@@ -13,16 +13,21 @@ public:
 
     std::vector<double> GetActivatedValues() const;
     std::vector<double> GetDerivedValues() const;
-    void SetGradients(std::vector<double>& gradients);
+    void SetGradients(std::vector<double> &gradients);
 
     void ActivateLayer(std::vector<double> &inputs);
     void DeriveLayer();
 
-    std::vector<Neuron> GetNeurons() const;
+    std::vector<Neuron>& GetNeurons();
 
     unsigned GetNeuronsCount() const;
     unsigned GetInputCount() const;
-    private:
+
+    void CalculateOutputLayerGradient(const std::vector<double> &targets);
+    void CalculateHiddenLayerGradient(const Layer &nextLayer);
+    void UpdateWeights(Layer& prevLayer);
+
+private:
     std::vector<Neuron> neurons;
 
     unsigned neuronsCount { 0 };

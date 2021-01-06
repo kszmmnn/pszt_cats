@@ -9,7 +9,12 @@ int main()
 
     std::vector<unsigned> dimensions = {2,3,2};
     Layers l(dimensions);
-    l.ActivateAndDeriveAll(12, 13);
-    l.Propagate(1);
+    l.ActivateAndDeriveAll(2.5,12.7);
+    std::vector<double> out = {1,0};
+    l.Propagate(out);
+    l.ActivateAndDeriveAll(2.5,12.7);
+    l.Propagate(out);
     return 0;
 }
+
+//w jednym miejscu error, w drugim gradient - zdecydowac sie
