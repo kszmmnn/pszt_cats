@@ -20,6 +20,7 @@ public:
 
     void SetWeights(std::vector<double> &_weights);
     void SetWeight(unsigned pos, double _weight);
+    void SetBias(double _bias);
     std::vector<double> GetWeights() const;
 
 private:

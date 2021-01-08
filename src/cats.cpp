@@ -1,40 +1,46 @@
 #include "Layers.hpp"
 #include "Utils.hpp"
+#include "FileReader.hpp"
 
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
+#include <filesystem>
+namespace fs = std::filesystem;
 int main()
 {
+    unsigned successCount = 0;
+    unsigned tries = 0;
     RandomNumber randNum();
-
-    std::vector<unsigned> dimensions = { 2, 3, 2 };
+    std::string filename = "cats.csv";
+    FileReader *freader = FileReader::GetInstance(filename);
+    std::vector<unsigned> dimensions = { 2,  100, 2 };
     Layers l(dimensions);
-    l.ActivateAndDeriveAll(2.5, 12.7);
-    std::vector<double> out = { 0, 1 };
-    l.Propagate(out);
-    printf("%f  ", l.Cost(out));
 
-    out = { 1, 0 };
-    l.ActivateAndDeriveAll(2.1, 8.1);
-    printf("%f  ", l.Cost(out));
-    l.Propagate(out);
+    std::tuple<bool, double, double> config;
+    while (freader->ParseConfig(config))
+    {
+        l.ActivateAndDeriveAll(std::get<1>(config), std::get<2>(config));
+        std::vector<double> out;
+        bool isFemale = std::get<0>(config);
+        if (isFemale == true)
+        {
+            out = { 1, 0 };
+        }
+        else
+        {
+            out = { 0, 1 };
+        }
+        if(isFemale == l.IsOutputFemale())
+        {
+            ++successCount;
+        }
+        ++tries;
+        l.Propagate(out);
+        printf("%f  \n", l.Cost(out));
+    }
 
-    l.ActivateAndDeriveAll(2.1, 8.1);
-    printf("%f  ", l.Cost(out));
-    l.Propagate(out);
-    l.ActivateAndDeriveAll(2.1, 8.1);
-    printf("%f  ", l.Cost(out));
-    l.Propagate(out);
-    l.ActivateAndDeriveAll(2.1, 8.1);
-    printf("%f  ", l.Cost(out));
-    l.Propagate(out);
-    l.ActivateAndDeriveAll(2.1, 8.1);
-    printf("%f  ", l.Cost(out));
-    l.Propagate(out);
-    l.ActivateAndDeriveAll(2.1, 8.1);
-    printf("%f  ", l.Cost(out));
-    l.Propagate(out);
-
+    printf("success %u   tries %u", successCount, tries);
     return 0;
 }
 

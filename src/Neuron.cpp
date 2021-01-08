@@ -46,6 +46,11 @@ void Neuron::SetWeights(std::vector<double> &_weights)
     weights = _weights;
 }
 
+void Neuron::SetBias(double _bias)
+{
+    bias = _bias;
+}
+
 std::vector<double> Neuron::GetWeights() const
 {
     return weights;

@@ -11,7 +11,7 @@ Layers::Layers(std::vector<unsigned> &dimensions)
     {
         if (i == 0)
         {
-            layers.push_back(Layer(dimensions[0], dimensions[2]));
+            layers.push_back(Layer(dimensions[0], inputCount));
         }
         else if (i == dimensions.size() - 1)
         {
@@ -77,6 +77,19 @@ double Layers::Cost(std::vector<double> &target)
         cost += std::pow((outputNeurons[i].GetActivatedValue() - target[i]), 2);
     }
     return cost;
+}
+
+bool Layers::IsOutputFemale()
+{
+    const auto output = layers.back().GetActivatedValues();
+    if (output[0] > output[1])
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void Layers::Propagate(std::vector<double> &target)

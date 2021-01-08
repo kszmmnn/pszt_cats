@@ -14,9 +14,13 @@ public:
     void ActivateAndDeriveAll(double bwt, double hwt);
     void Propagate(std::vector<double> &target);
     double Cost(std::vector<double> &target);
+    bool IsOutputFemale();
 
 private:
     std::vector<Layer> layers;
+
+    const unsigned inputCount = 2;
+
 };
 
 //https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
