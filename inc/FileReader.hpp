@@ -17,7 +17,9 @@ public:
 
     bool ParseConfig(std::tuple<bool, double, double> &ret);
     std::tuple<bool, double, double> GetSingleConfig(std::string line);
-    private:
+
+    void seekToStart();
+private:
     std::fstream file;
     std::string fileName;
     static FileReader *_instance;

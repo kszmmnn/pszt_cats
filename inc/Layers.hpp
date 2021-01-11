@@ -8,19 +8,23 @@
 class Layers
 {
 public:
-    Layers(std::vector<unsigned> &dimensions);
+    Layers(int numOfInputs, std::vector<unsigned> hiddenLayer, int numOfOutputs);
     virtual ~Layers();
 
-    void ActivateAndDeriveAll(double bwt, double hwt);
+    void Activate(const double &bwt, const double &hwt);
+    void Derive();
     void Propagate(std::vector<double> &target);
-    double Cost(std::vector<double> &target);
     bool IsOutputFemale();
 
+    double Cost(std::vector<double> &target);
+  
 private:
     std::vector<Layer> layers;
 
-    const unsigned inputCount = 2;
-
+    Layer& getLastHiddenLayer();
+    void initHiddenLayers(int numOfInputs, std::vector<unsigned>& hiddenLayers);
+    void initHiddenLayer(int numOfNeutrons, int previousLayerOutputs);
+    void initOutputLayer(int numOfOutputs, int lastLayerOutputs);
 };
 
 //https://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/

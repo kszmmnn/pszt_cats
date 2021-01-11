@@ -8,20 +8,23 @@ class Neuron
 public:
     Neuron(std::vector<double> &_weights, double _bias);
     virtual ~Neuron();
-    void Activate(double value);
+
+    void Active(double value);
     void Derive();
 
+    std::vector<double> GetWeights() const;
+    double getWeight(int index) const;
     double GetActivatedValue() const;
     double GetDerivedValue() const;
     double GetValue() const;
     double GetBias() const;
     double GetError() const;
-    void SetError(double _error);
 
+    void SetError(double _error);
     void SetWeights(std::vector<double> &_weights);
     void SetWeight(unsigned pos, double _weight);
     void SetBias(double _bias);
-    std::vector<double> GetWeights() const;
+  
 
 private:
     double value { 0.0 };

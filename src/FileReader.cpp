@@ -68,3 +68,9 @@ std::tuple<bool, double, double> FileReader::GetSingleConfig(std::string line)
     item = std::make_tuple(isFemale, bwt, hwt);
     return item;
 }
+
+void FileReader::seekToStart()
+{
+    file.clear();
+    file.seekg(0);
+}

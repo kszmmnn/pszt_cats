@@ -1,5 +1,6 @@
 #include "Neuron.hpp"
 #include <cmath>
+#include <iostream>
 
 Neuron::Neuron(std::vector<double> &_weights, double _bias) :
         weights(_weights), bias(_bias)
@@ -10,7 +11,7 @@ Neuron::~Neuron()
 {
 }
 
-void Neuron::Activate(double value)
+void Neuron::Active(double value)
 {
     this->value = value;
     activatedValue = 1 / (1 + std::exp(-value));
@@ -54,6 +55,11 @@ void Neuron::SetBias(double _bias)
 std::vector<double> Neuron::GetWeights() const
 {
     return weights;
+}
+
+double Neuron::getWeight(int index) const
+{
+    return weights[index];
 }
 
 void Neuron::SetError(double _error)
