@@ -18,6 +18,10 @@ int main()
 
     // num of inputs, { hidden layer}, num of outputs
     Layers layers(2, { 20 }, 2);
+    
+    // config
+    layers.setLearningRate(0.05);
+
     std::tuple<bool, double, double> config;
     double bwt;
     double hwt;
@@ -42,7 +46,7 @@ int main()
 
         ++tries;
     }
-    std::cout << "Female: " << countFemale << std::endl;
+
     printf("Proby przed uczeniem:  %u/%u \n", successCount, tries);
 
 
@@ -51,6 +55,7 @@ int main()
         successCount = 0;
         tries = 0;
         fileReader->seekToStart();
+        int checked = 0;
 
         while (fileReader->ParseConfig(config))
         {
@@ -80,7 +85,7 @@ int main()
 
             layers.Derive();
             layers.Propagate(out);
-            // printf("%f  \n", layers.Cost(out));
+           //printf("%f  \n", layers.Cost(out));
         }
 
         printf("Proby podczas uczenia:  %u/%u \n", successCount, tries);

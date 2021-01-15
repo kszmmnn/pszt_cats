@@ -70,7 +70,7 @@ void Layers::Activate(const double& bwt, const double& hwt)
     for (auto& layer : layers)
     {
         layer.Activate(input);
-        input = layer.GetActivatedValues();
+        input = layer.GetOutputValues();
     }
 }
 
@@ -82,36 +82,30 @@ void Layers::Derive()
     }
 }
 
-bool Layers::IsOutputFemale()
-{
-    const auto output = layers.back().GetActivatedValues();
-    //std::cout << output[0] << " " << output[1] << std::endl;
-    return (output[0] > output[1]);
-}
-
-
 void Layers::Propagate(std::vector<double> &target)
 {
     auto& lastHiddenLayer = getLastHiddenLayer();
     Layer& outputLayer = layers.back();
-    outputLayer.CalculateOutputLayerGradient(target);
+    outputLayer.CalculateOutputLayerError(target);
 
-//        m_recentAverageError =
-//                (m_recentAverageError * m_recentAverageSmoothingFactor + m_error)
-//                / (m_recentAverageSmoothingFactor + 1.0);
-//        // Calculate output layer gradients
 
     for (int i = layers.size() - 2; i >= 0; --i)
     {
         Layer& lastLayer = layers[i + 1];
         Layer &layer = layers[i];
-        layer.CalculateHiddenLayerGradient(lastLayer);
+        layer.CalculateHiddenLayerError(lastLayer);
     }
 
     for (unsigned i = 1; i < layers.size(); ++i)
     {
-        layers[i].UpdateWeights(layers[i - 1]);
+        layers[i].UpdateWeights(layers[i - 1], learningRate);
     }
+}
+
+bool Layers::IsOutputFemale()
+{
+    const auto output = layers.back().GetOutputValues();
+    return (output[0] > output[1]);
 }
 
 double Layers::Cost(std::vector<double>& target)
@@ -123,8 +117,13 @@ double Layers::Cost(std::vector<double>& target)
 
     for (unsigned i = 0; i < target.size(); ++i)
     {
-        cost += std::pow((outputNeurons[i].GetActivatedValue() - target[i]), 2);
+        cost += std::pow((outputNeurons[i].GetOutputValue() - target[i]), 2);
     }
 
     return cost;
+}
+
+void Layers::setLearningRate(double learningRate)
+{
+    this->learningRate = learningRate;
 }

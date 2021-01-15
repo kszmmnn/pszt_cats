@@ -12,22 +12,21 @@ public:
     ~Layer();
 
     std::vector<Neuron>& GetNeurons();
-    std::vector<double> GetActivatedValues() const;
+    std::vector<double> GetOutputValues() const;
     std::vector<double> GetDerivedValues() const;
-    void SetGradients(std::vector<double> &gradients);
-
+    
     void Activate(std::vector<double> &inputs);
     void Derive();
-
-    void CalculateOutputLayerGradient(const std::vector<double> &targets);
-    void CalculateHiddenLayerGradient(const Layer &nextLayer);
-    void UpdateWeights(Layer &prevLayer);
+    
+    void CalculateOutputLayerError(const std::vector<double> &targets);
+    void CalculateHiddenLayerError(const Layer &nextLayer);
+    void UpdateWeights(Layer &prevLayer, const double& learningRate);
 
 private:
     std::vector<Neuron> neurons;
-
+    
     unsigned neuronsCount { 0 };
-    unsigned inputCount { 0 };
+    unsigned inputCount{ 0 };
 };
 
 #endif /* LAYER_HPP_ */

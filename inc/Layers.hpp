@@ -18,8 +18,10 @@ public:
 
     double Cost(std::vector<double> &target);
   
+    void setLearningRate(double learningRate);
 private:
     std::vector<Layer> layers;
+    double learningRate = 0.1;
 
     Layer& getLastHiddenLayer();
     void initHiddenLayers(int numOfInputs, std::vector<unsigned>& hiddenLayers);

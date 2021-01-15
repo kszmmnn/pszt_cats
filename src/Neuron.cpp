@@ -14,7 +14,7 @@ Neuron::~Neuron()
 void Neuron::Active(double value)
 {
     this->value = value;
-    activatedValue = 1 / (1 + std::exp(-value));
+    outputValue = 1 / (1 + std::exp(-value));
 }
 
 void Neuron::Derive()
@@ -22,9 +22,9 @@ void Neuron::Derive()
     derivedValue = std::exp(-value) / std::pow(1 + std::exp(-value), 2);
 }
 
-double Neuron::GetActivatedValue() const
+double Neuron::GetOutputValue() const
 {
-    return activatedValue;
+    return outputValue;
 }
 
 double Neuron::GetDerivedValue() const

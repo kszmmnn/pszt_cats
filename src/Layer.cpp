@@ -38,23 +38,43 @@ Layer::~Layer()
 {
 }
 
-void Layer::SetGradients(std::vector<double> &gradients)
-{
-    assert(gradients.size() == neurons.size());
 
-    for (unsigned i = 0; i < neurons.size(); ++i)
+void Layer::Derive()
+{
+    for (auto& neuron : neurons)
     {
-        neurons[i].SetError(gradients[i]);
+        neuron.Derive();
     }
 }
 
-std::vector<double> Layer::GetActivatedValues() const
+void Layer::Activate(std::vector<double>& inputs)
+{
+    assert(inputs.size() == inputCount);
+    double sum;
+
+    for (unsigned i = 0; i < neuronsCount; ++i)
+    {
+        sum = 0.0;
+
+        for (unsigned j = 0; j < inputCount; ++j)
+        {
+            sum += inputs[j] * neurons[i].getWeight(j);
+        }
+
+        sum += neurons[i].GetBias();
+
+        neurons[i].Active(sum);
+    }
+}
+
+
+std::vector<double> Layer::GetOutputValues() const
 {
     std::vector<double> ret;
 
     for (const auto &neuron : neurons)
     {
-        ret.push_back(neuron.GetActivatedValue());
+        ret.push_back(neuron.GetOutputValue());
     }
 
     return ret;
@@ -77,27 +97,8 @@ std::vector<Neuron>& Layer::GetNeurons()
     return neurons;
 }
 
-void Layer::Activate(std::vector<double> &inputs)
-{
-    assert(inputs.size() == inputCount);
-    double sum;
 
-    for (unsigned i = 0; i < neuronsCount; ++i)
-    {
-        sum = 0.0;
-
-        for (unsigned j = 0; j < inputCount; ++j)
-        {
-            sum += inputs[j] * neurons[i].getWeight(j);
-        }
-
-        sum += neurons[i].GetBias();
-        
-        neurons[i].Active(sum);
-    }
-}
-
-void Layer::CalculateOutputLayerGradient(const std::vector<double> &targets)
+void Layer::CalculateOutputLayerError(const std::vector<double> &targets)
 {
     double dCost;
     double dSigmoid;
@@ -105,7 +106,7 @@ void Layer::CalculateOutputLayerGradient(const std::vector<double> &targets)
 
     for (unsigned i = 0; i < targets.size(); ++i)
     {
-        dCost = 2 * (targets[i] - neurons[i].GetActivatedValue());
+        dCost = 2 * (targets[i] - neurons[i].GetOutputValue());
         dSigmoid = neurons[i].GetDerivedValue();
         error = dCost * dSigmoid;
 
@@ -113,7 +114,7 @@ void Layer::CalculateOutputLayerGradient(const std::vector<double> &targets)
     }
 }
 
-void Layer::CalculateHiddenLayerGradient(const Layer &nextLayer)
+void Layer::CalculateHiddenLayerError(const Layer &nextLayer)
 {
     double dSigmoid;
     double errorSum;
@@ -135,15 +136,7 @@ void Layer::CalculateHiddenLayerGradient(const Layer &nextLayer)
     }
 }
 
-void Layer::Derive()
-{
-    for (auto &neuron : neurons)
-    {
-        neuron.Derive();
-    }
-}
-
-void Layer::UpdateWeights(Layer &prevLayer)
+void Layer::UpdateWeights(Layer &prevLayer, const double& learningRate)
 {
     double dWeight;
 
@@ -152,15 +145,15 @@ void Layer::UpdateWeights(Layer &prevLayer)
         for (unsigned j = 0; j < neurons[i].GetWeights().size(); ++j)
         {
             Neuron &neuron = prevLayer.neurons[j];
-            dWeight = /*learningrate*/0.1 * neurons[i].GetError()
-                                             * neuron.GetActivatedValue();
+            dWeight = learningRate * neurons[i].GetError()
+                                             * neuron.GetOutputValue();
 
             
             neurons[i].SetWeight(j, dWeight + neurons[i].getWeight(j));
         }
 
         neurons[i].SetBias(
-                neurons[i].GetBias() + /*learningrate*/0.1
-                        * neurons[i].GetError()); //mozebyczle
+                neurons[i].GetBias() + learningRate
+                        * neurons[i].GetError()); 
     }
 }

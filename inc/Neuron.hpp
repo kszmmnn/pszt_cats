@@ -14,7 +14,7 @@ public:
 
     std::vector<double> GetWeights() const;
     double getWeight(int index) const;
-    double GetActivatedValue() const;
+    double GetOutputValue() const;
     double GetDerivedValue() const;
     double GetValue() const;
     double GetBias() const;
@@ -28,7 +28,7 @@ public:
 
 private:
     double value { 0.0 };
-    double activatedValue { 0.0 };
+    double outputValue { 0.0 };
     double derivedValue { 0.0 };
     double error { 0.0 };
 

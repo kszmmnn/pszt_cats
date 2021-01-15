@@ -9,16 +9,17 @@
 class FileReader
 {
 public:
-    FileReader();
-    virtual ~FileReader();
+    FileReader() = delete;
+    FileReader(FileReader& clone) = delete;
+    ~FileReader();
 
     static FileReader* GetInstance(std::string fileName);
-    FileReader(FileReader &clone) = delete;
+    
 
     bool ParseConfig(std::tuple<bool, double, double> &ret);
     std::tuple<bool, double, double> GetSingleConfig(std::string line);
-
     void seekToStart();
+
 private:
     std::fstream file;
     std::string fileName;
