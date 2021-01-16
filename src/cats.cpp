@@ -21,6 +21,7 @@ int main()
     
     // config
     layers.setLearningRate(0.05);
+    unsigned epochs = 10;
 
     std::tuple<bool, double, double> config;
     double bwt;
@@ -50,7 +51,7 @@ int main()
     printf("Proby przed uczeniem:  %u/%u \n", successCount, tries);
 
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < epochs; i++)
     {
         successCount = 0;
         tries = 0;
@@ -85,7 +86,6 @@ int main()
 
             layers.Derive();
             layers.Propagate(out);
-           //printf("%f  \n", layers.Cost(out));
         }
 
         printf("Proby podczas uczenia:  %u/%u \n", successCount, tries);
@@ -121,4 +121,3 @@ int main()
     return 0;
 }
 
-//w jednym miejscu error, w drugim gradient - zdecydowac sie
