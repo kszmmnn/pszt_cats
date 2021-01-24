@@ -1,78 +1,70 @@
-#include "Neuron.hpp"
-#include <cmath>
+#include "Neuron.h"
 #include <iostream>
 
-Neuron::Neuron(std::vector<double> &_weights, double _bias) :
-        weights(_weights), bias(_bias)
+Neuron::Neuron(int numOfInputs, double maxWeight) : numOfInputs(numOfInputs)
 {
+	RandomNumber* randomNum = RandomNumber::GetInstance();
+	
+	for (int i = 0; i < numOfInputs; i++)
+	{
+		weights.push_back(randomNum->RandomDouble(-maxWeight, maxWeight));
+	}
 }
 
-Neuron::~Neuron()
+void Neuron::CalcValue(const std::vector<double>& inputs)
 {
+	double sum = 0.0;
+
+	for (int i = 0; i < numOfInputs; i++)
+	{
+		sum += inputs[i] * weights[i];
+	}
+
+	value = sum;
 }
 
-void Neuron::Active(double value)
+void Neuron::CalcActivation()
 {
-    this->value = value;
-    outputValue = 1 / (1 + std::exp(-value));
+	activationValue = 1.0 / (1.0 + std::exp(value));
 }
 
-void Neuron::Derive()
+
+double Neuron::CalcDerivative()
 {
-    derivedValue = std::exp(-value) / std::pow(1 + std::exp(-value), 2);
+	return activationValue * (1.0 - activationValue);
 }
 
-double Neuron::GetOutputValue() const
+void Neuron::SetWeight(double weight, int index)
 {
-    return outputValue;
+	weights[index] = weight;
 }
 
-double Neuron::GetDerivedValue() const
+void Neuron::SetError(double error)
 {
-    return derivedValue;
+	this->error = error;
 }
 
-double Neuron::GetValue() const
+void Neuron::UpdateWeight(double weight, int index)
 {
-    return value;
+	weights[index] -= weight;
 }
 
-double Neuron::GetBias() const
+double Neuron::GetWeight(int index)
 {
-    return bias;
+	return weights[index];
 }
 
-void Neuron::SetWeights(std::vector<double> &_weights)
+double Neuron::GetActivationValue()
 {
-    weights = _weights;
+	return activationValue;
 }
 
-void Neuron::SetBias(double _bias)
+double Neuron::GetValue()
 {
-    bias = _bias;
+	return value;
 }
 
-std::vector<double> Neuron::GetWeights() const
+double Neuron::GetError()
 {
-    return weights;
-}
-
-double Neuron::getWeight(int index) const
-{
-    return weights[index];
-}
-
-void Neuron::SetError(double _error)
-{
-    error = _error;
-}
-
-double Neuron::GetError() const
-{
-    return error;
-}
-
-void Neuron::SetWeight(unsigned pos, double _weight)
-{
-    weights[pos] = _weight;
+	return error;
 }

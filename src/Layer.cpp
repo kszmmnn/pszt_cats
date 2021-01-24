@@ -1,159 +1,136 @@
-#include "Layer.hpp"
-#include "Utils.hpp"
+#include "Layer.h"
+
 #include <iostream>
-#include <cassert>
 
-Layer::Layer(unsigned _neuronsCount, unsigned _inputCount, std::vector<std::vector<double>> &_weights) :
-        neuronsCount(_neuronsCount), inputCount(_inputCount)
-{
-    auto ranum = RandomNumber::GetInstance();
-
-    for (unsigned i = 0; i < neuronsCount; ++i)
-    {
-        assert(inputCount == _weights[i].size());
-
-        neurons.push_back(Neuron(_weights[i], ranum->RandomDouble()));
-    }
-}
-
-Layer::Layer(unsigned _neuronsCount, unsigned _inputCount) :
-        neuronsCount(_neuronsCount), inputCount(_inputCount)
-{
-    auto ranum = RandomNumber::GetInstance();
-
-    for (unsigned i = 0; i < neuronsCount; ++i)
-    {
-        std::vector<double> weights;
-
-       for (unsigned j = 0; j < inputCount; ++j)
-       {
-            weights.push_back(ranum->RandomDouble());
-       }
-         
-        neurons.push_back(Neuron(weights, ranum->RandomDouble()));
-    }
-}
-
-Layer::~Layer()
+Layer::Layer()
 {
 }
 
-
-void Layer::Derive()
+Layer::Layer(int numOfInputs, int numOfNeurons, bool outputLayer) : numOfInputs(numOfInputs), numOfNeurons(numOfNeurons)
 {
-    for (auto& neuron : neurons)
-    {
-        neuron.Derive();
-    }
+	if (!outputLayer)
+	{
+		initLayer();
+	}
+	else
+	{
+		initLayer(1);
+	}
 }
 
-void Layer::Activate(std::vector<double>& inputs)
+void Layer::initLayer()
 {
-    assert(inputs.size() == inputCount);
-    double sum;
-
-    for (unsigned i = 0; i < neuronsCount; ++i)
-    {
-        sum = 0.0;
-
-        for (unsigned j = 0; j < inputCount; ++j)
-        {
-            sum += inputs[j] * neurons[i].getWeight(j);
-        }
-
-        sum += neurons[i].GetBias();
-
-        neurons[i].Active(sum);
-    }
+	double maxWeight = 1 / std::sqrt(numOfInputs);
+	initLayer(maxWeight);
 }
 
-
-std::vector<double> Layer::GetOutputValues() const
+void Layer::initLayer(double maxWeight)
 {
-    std::vector<double> ret;
+	for (int i = 0; i < numOfNeurons; i++)
+	{
+		std::shared_ptr<Neuron> neuron = std::make_shared<Neuron>(numOfInputs, maxWeight);
 
-    for (const auto &neuron : neurons)
-    {
-        ret.push_back(neuron.GetOutputValue());
-    }
-
-    return ret;
+		neurons.push_back(neuron);
+	}
 }
 
-std::vector<double> Layer::GetDerivedValues() const
+void Layer::Activate(const std::vector<double>& input)
 {
-    std::vector<double> ret;
-
-    for (const auto &neuron : neurons)
-    {
-        ret.push_back(neuron.GetDerivedValue());
-    }
-
-    return ret;
+	std::shared_ptr<Neuron> neuron;
+	for (int i = 0; i < numOfNeurons; i++)
+	{
+		neuron = neurons[i];
+		neuron->CalcValue(input);
+		neuron->CalcActivation();
+	}
 }
 
-std::vector<Neuron>& Layer::GetNeurons()
+void Layer::CalcGradient(const std::shared_ptr<Layer>& nextLayer)
 {
-    return neurons;
+	double error;
+	int nextLayerSize = nextLayer->GetNeuronsCount();
+	std::shared_ptr<Neuron> nextLayerNeuron;
+
+	for (int i = 0; i < numOfNeurons; i++)
+	{
+		error = 0.0;
+		
+		for (int j = 0; j < nextLayerSize; j++)
+		{
+			nextLayerNeuron = nextLayer->GetNeuron(j);
+			error += nextLayerNeuron->GetError() * nextLayerNeuron->GetWeight(i);
+		}
+		
+		error *= neurons[i]->CalcDerivative();
+		neurons[i]->SetError(error);
+	}
 }
 
-
-void Layer::CalculateOutputLayerError(const std::vector<double> &targets)
+void Layer::CalcOutputLayerGradient(const std::vector<double>& expectedValues)
 {
-    double dCost;
-    double dSigmoid;
-    double error;
+	double error;
+	double output;
 
-    for (unsigned i = 0; i < targets.size(); ++i)
-    {
-        dCost = 2 * (targets[i] - neurons[i].GetOutputValue());
-        dSigmoid = neurons[i].GetDerivedValue();
-        error = dCost * dSigmoid;
+	for (int i = 0; i < numOfNeurons; i++)
+	{
+		output = neurons[i]->GetValue();
+		error = neurons[i]->CalcDerivative();
+		error *= -(expectedValues[i] - output);
 
-        neurons[i].SetError(error);
-    }
+		neurons[i]->SetError(error);
+	}
 }
 
-void Layer::CalculateHiddenLayerError(const Layer &nextLayer)
+void Layer::UpdateWeights(const std::vector<double>& inputs, const double& learningRate)
 {
-    double dSigmoid;
-    double errorSum;
-    double error;
+	std::shared_ptr<Neuron> neuron;
+	double deltaForAll;
+	double delta;
 
-    for (unsigned i = 0; i < neurons.size(); ++i)
-    {
-        dSigmoid = neurons[i].GetDerivedValue();
-        errorSum = 0.0;
+	for (int i = 0; i < numOfNeurons; i++)
+	{
+		neuron = neurons[i];
+		deltaForAll = learningRate * neuron->GetError();
+		for (int j = 0; j < numOfInputs; j++)
+		{
+			delta = deltaForAll * inputs[j];
+			neuron->UpdateWeight(delta, j);
+		}
+	}
 
-        for (unsigned j = 0; j < nextLayer.neurons.size(); ++j)
-        {
-            auto &neuron = nextLayer.neurons[j];
-            errorSum += neuron.GetError() * neuron.getWeight(j);
-        }
 
-        error = dSigmoid * errorSum;
-        neurons[i].SetError(error);
-    }
 }
 
-void Layer::UpdateWeights(Layer &prevLayer, const double& learningRate)
+std::vector<double> Layer::GetActivationValues()
 {
-    double dWeight;
+	std::vector<double> values;
 
-    for (unsigned i = 0; i < neurons.size(); ++i)
-    {
-        for (unsigned j = 0; j < neurons[i].GetWeights().size(); ++j)
-        {
-            Neuron &neuron = prevLayer.neurons[j];
-            dWeight = learningRate * neurons[i].GetError()
-                                             * neuron.GetOutputValue();
+	for (int i = 0; i < numOfNeurons; i++)
+	{
+		values.push_back(neurons[i]->GetActivationValue());
+	}
 
-            
-            neurons[i].SetWeight(j, dWeight + neurons[i].getWeight(j));
-        }
+	return values;
+}
 
-        neurons[i].SetBias(
-                neurons[i].GetBias() + learningRate
-                        * neurons[i].GetError()); 
-    }
+std::vector<double> Layer::GetValues()
+{
+	std::vector<double> values;
+
+	for (int i = 0; i < numOfNeurons; i++)
+	{
+		values.push_back(neurons[i]->GetValue());
+	}
+
+	return values;
+}
+
+int Layer::GetNeuronsCount()
+{
+	return numOfNeurons;
+}
+
+std::shared_ptr<Neuron> Layer::GetNeuron(int index)
+{
+	return neurons[index];
 }

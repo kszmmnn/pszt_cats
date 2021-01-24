@@ -1,9 +1,9 @@
-#include "FileReader.hpp"
+#include "FileReader.h"
 
-FileReader *FileReader::_instance = nullptr;
+FileReader* FileReader::_instance = nullptr;
 
 FileReader::FileReader(std::string _fileName) :
-        fileName(_fileName)
+    fileName(_fileName)
 {
     OpenFile();
 }
@@ -30,7 +30,7 @@ void FileReader::OpenFile()
     }
 }
 
-bool FileReader::ParseConfig(std::tuple<bool, double, double> &ret)
+bool FileReader::ParseConfig(std::tuple<bool, double, double>& ret)
 {
     std::string line;
 
@@ -61,9 +61,9 @@ std::tuple<bool, double, double> FileReader::GetSingleConfig(std::string line)
     position = line.find(delimiter, 2);
 
     double bwt = std::stod(
-            line.substr(position + 1, line.find(delimiter, 4) - 1));
+        line.substr(position + 1, line.find(delimiter, 4) - 1));
     double hwt = std::stod(
-            line.substr(line.find(delimiter, 4) + 1, line.length() - 1));
+        line.substr(line.find(delimiter, 4) + 1, line.length() - 1));
 
     item = std::make_tuple(isFemale, bwt, hwt);
     return item;
