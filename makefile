@@ -5,7 +5,8 @@ SRC_DIR := ./src
 INC_DIR := ./inc
 CFLAGS := -Wall -Wextra -pedantic -std=c++17 -Iinc
 
-
+dataset.o: $(INC_DIR)/DataSet.h $(SRC_DIR)/DataSet.cpp
+	g++ $(CFLAGS) -c $(SRC_DIR)/DataSet.cpp -o dataset.o
 
 filereader.o: $(INC_DIR)/FileReader.h $(SRC_DIR)/FileReader.cpp
 	g++ $(CFLAGS) -c $(SRC_DIR)/FileReader.cpp -o filereader.o
@@ -23,11 +24,11 @@ network.o: $(INC_DIR)/Network.h $(SRC_DIR)/Network.cpp layer.o
 	g++ $(CFLAGS) -c $(SRC_DIR)/Network.cpp -o network.o
 
 
-main.o: $(SRC_DIR)/main.cpp filereader.o network.o
+main.o: $(SRC_DIR)/main.cpp filereader.o network.o dataset.o
 	g++ $(CFLAGS) -c  $(SRC_DIR)/main.cpp -o main.o
 
 pszt_cats: main.o
-	g++ -o pszt-cats main.o network.o filereader.o layer.o neuron.o randomnumber.o
+	g++ -o pszt-cats main.o network.o filereader.o layer.o neuron.o randomnumber.o dataset.o
 
 all: pszt_cats
 
