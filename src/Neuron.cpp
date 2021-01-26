@@ -25,7 +25,7 @@ void Neuron::CalcValue(const std::vector<double>& inputs)
 
 void Neuron::CalcActivation()
 {
-	activationValue = 1.0 / (1.0 + std::exp(value));
+	activationValue = 1.0 / (1.0 + std::exp(-value));
 }
 
 
