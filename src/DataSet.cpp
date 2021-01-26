@@ -57,7 +57,7 @@ void DataSet::CalcMean()
 	double sumBwt = 0.0;
 	double sumHwt = 0.0;
 
-	for (int i = 0; i < dataRows.size(); i++)
+	for (unsigned i = 0; i < dataRows.size(); i++)
 	{
 		sumBwt += std::get<1>(dataRows[i]);
 		sumHwt += std::get<2>(dataRows[i]);
@@ -74,7 +74,7 @@ void DataSet::CalcStdError()
 	double sumStdBwt = 0.0;
 	double sumStdHwt = 0.0;
 
-	for (int i = 0; i < dataRows.size(); i++)
+	for (unsigned i = 0; i < dataRows.size(); i++)
 	{
 		bwt = std::get<1>(dataRows[i]);
 		hwt = std::get<2>(dataRows[i]);
