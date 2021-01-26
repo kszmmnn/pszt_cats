@@ -22,7 +22,7 @@ void Network::initHiddenLayers(const std::vector<int>& hiddenLayersSize)
 
 void Network::initOutputLayer(const double& inputs)
 {
-	outputLayer = std::make_shared<Layer>(inputs, numOfOutputs, true);
+	outputLayer = std::make_shared<Layer>(inputs + 1, numOfOutputs, true);
 }
 
 Network::~Network()
@@ -60,7 +60,7 @@ void Network::SetLearningRate(double learningRate)
 
 double Network::CalcCost()
 {
-	std::vector<double> output = outputLayer->GetValues();
+	std::vector<double> output = outputLayer->GetActivationValues();
 	double cost = 0.0;
 
 	for (int i = 0; i < numOfOutputs; i++)
@@ -95,7 +95,6 @@ void Network::Backpropagation()
 	}
 
 	outputLayer->UpdateWeights(previousOutput, learningRate);
-
 }
 
 bool Network::IsFemale()

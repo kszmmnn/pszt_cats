@@ -9,7 +9,7 @@ int main()
     Network* network;
     DataSet dataSet;
 
-    int repeat = 10;
+    int repeat = 25;
     int epochs = 10;
 
 
@@ -30,14 +30,14 @@ int main()
     double bwt;
     double hwt;
 
-    int sumSuccess = 0;
+    double sumSuccess = 0.0;
     int successCount = 0;
     int tries;
 
     for (int r = 0; r < repeat; r++)
     {
-        network = new Network(2, { 10 }, 2);
-        network->SetLearningRate(0.05);
+        network = new Network(2, { 30, 19, 10 }, 2);
+        network->SetLearningRate(0.1);
 
         // Uczenie 
         for (int i = 0; i < epochs; i++)
@@ -57,6 +57,7 @@ int main()
 
         successCount = 0;
         tries = 0;
+        int female = 0;
 
         // Testowanie predykcji
         for (int row = 0; row < dataSetSize; row++)
@@ -73,6 +74,9 @@ int main()
                 ++successCount;
             }
 
+            if (network->IsFemale())
+                female++;
+
             tries++;
         }
 
@@ -80,8 +84,9 @@ int main()
         sumSuccess += successCount;
     }
 
+
     sumSuccess /= repeat;
-    std::cout << sumSuccess << "," << (double)sumSuccess / 144 << std::endl;
-   
+    std::cout << sumSuccess << "," << sumSuccess / 144 << std::endl;
+
 	return 0;
 }

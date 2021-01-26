@@ -14,7 +14,8 @@ Layer::Layer(int numOfInputs, int numOfNeurons, bool outputLayer) : numOfInputs(
 	}
 	else
 	{
-		initLayer(1);
+		// warstwa wyjœciowa inicjalizowana zerowymi wagami
+		initLayer(0.0); 
 	}
 }
 
@@ -73,9 +74,11 @@ void Layer::CalcOutputLayerGradient(const std::vector<double>& expectedValues)
 
 	for (int i = 0; i < numOfNeurons; i++)
 	{
-		output = neurons[i]->GetValue();
+		output = neurons[i]->GetActivationValue();
 		error = neurons[i]->CalcDerivative();
-		error *= -(expectedValues[i] - output);
+		//error *= (expectedValues[i] - output);
+		
+		error *= (output - expectedValues[i]);
 
 		neurons[i]->SetError(error);
 	}
@@ -91,14 +94,13 @@ void Layer::UpdateWeights(const std::vector<double>& inputs, const double& learn
 	{
 		neuron = neurons[i];
 		deltaForAll = learningRate * neuron->GetError();
+
 		for (int j = 0; j < numOfInputs; j++)
 		{
 			delta = deltaForAll * inputs[j];
 			neuron->UpdateWeight(delta, j);
 		}
 	}
-
-
 }
 
 std::vector<double> Layer::GetActivationValues()
